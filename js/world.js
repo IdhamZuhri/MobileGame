@@ -13,6 +13,8 @@ export const TILES = {
   snow:      { name: 'Tundra',     color: '#e8f1f5', deco: 'pine' },
   mountain:  { name: 'Mountains',  color: '#7b7f86', solid: true },
   plaza:     { name: 'Home Village', color: '#c9b98f' },
+  wall:      { name: 'Village Wall', color: '#6b6259', solid: true, pattern: 'brick' },
+  gate:      { name: 'Village Gate', color: '#8a6a3b', pattern: 'planks' },
 };
 
 export class World {
@@ -56,7 +58,13 @@ export class World {
 
   // Procedurally decide a tile from elevation / moisture / temperature noise.
   generate(tx, ty) {
-    if (this.village && Math.hypot(tx - this.village.cx, ty - this.village.cy) <= this.village.r) return 'plaza';
+    const v = this.village;
+    if (v) {
+      // Plaza inside, then a 1-tile wall ring with a 3-tile gate at north, south, east and west.
+      const dx = tx - v.cx, dy = ty - v.cy, d = Math.hypot(dx, dy);
+      if (d <= v.r) return 'plaza';
+      if (d <= v.r + 1) return (Math.abs(dx) <= 1 || Math.abs(dy) <= 1) ? 'gate' : 'wall';
+    }
     const s = this.seed;
     const e = fbm(tx / 40, ty / 40, s, 4);
     const m = fbm(tx / 55, ty / 55, s + 7, 3);
@@ -111,9 +119,22 @@ export class World {
         ctx.fillRect(px, py, TILE, TILE);
         ctx.fillStyle = shade > 0 ? `rgba(255,255,255,${shade})` : `rgba(0,0,0,${-shade})`;
         ctx.fillRect(px, py, TILE, TILE);
+        if (tile.pattern) this.drawPattern(ctx, tile.pattern, px, py);
         if (tile.deco && hash2(tx, ty, this.seed + 99) < 0.35) this.drawDeco(ctx, tile.deco, px, py);
       }
     }
+  }
+
+  drawPattern(ctx, kind, px, py) {
+    ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    if (kind === 'brick') {
+      for (let y = 8; y < TILE; y += 8) { ctx.moveTo(px, py + y); ctx.lineTo(px + TILE, py + y); }
+      for (let r = 0; r < 4; r++) for (let x = (r % 2) * 8 + 8; x < TILE; x += 16) { ctx.moveTo(px + x, py + r * 8); ctx.lineTo(px + x, py + r * 8 + 8); }
+    } else {
+      for (let y = 8; y < TILE; y += 8) { ctx.moveTo(px, py + y); ctx.lineTo(px + TILE, py + y); }
+    }
+    ctx.stroke();
   }
 
   drawDeco(ctx, kind, px, py) {

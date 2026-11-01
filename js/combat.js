@@ -21,7 +21,7 @@ export class Combat {
 
     // Auto-attack the nearest enemy in range.
     this.cd -= dt;
-    if (this.cd <= 0) {
+    if (this.cd <= 0 && !this.isSafe()) {   // no shooting from inside the village: it is a refuge, not a turret
       const t = this.enemies.nearest(p.x, p.y, s.range);
       if (t) {
         const base = Math.atan2(t.y - p.y, t.x - p.x), spread = 0.2;
