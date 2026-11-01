@@ -9,6 +9,9 @@ Serve the folder with any static server and open it on your phone or desktop:
 
 Controls: drag anywhere (virtual joystick) or WASD / arrow keys.
 
+## Documentation
+Full design and technical docs are in [`docs/`](docs/README.md).
+
 ## Structure
 - `js/rng.js` – seeded noise
 - `js/world.js` – procedural chunked world + data-driven biome table
