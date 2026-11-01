@@ -30,7 +30,7 @@ export class Enemies {
     const d = viewR + 40 + Math.random() * 80;
     const x = px + Math.cos(a) * d, y = py + Math.sin(a) * d;
     const tileId = this.world.tileAt(Math.floor(x / TILE), Math.floor(y / TILE));
-    if (this.world.isSolid(x, y) || this.world.inVillage(x, y)) return;
+    if (this.world.isSolid(x, y) || this.world.inHaven(x, y)) return;
     const types = Object.entries(ENEMY_TYPES).filter(([, t]) => t.biomes.includes(tileId));
     if (!types.length) return;
     const [name, t] = types[Math.floor(Math.random() * types.length)];
@@ -65,7 +65,7 @@ export class Enemies {
           }
         }
       } else if (d > 700) { e.dead = true; continue; } // despawn when far away
-      if (this.world.inVillage(e.x, e.y)) { e.dead = true; continue; }
+      if (this.world.inHaven(e.x, e.y)) { e.dead = true; continue; } // monsters vanish at the edge of the peaceful zone
       if (d > e.r + player.r - 2) {
         const nx = e.x + (dx / d) * e.speed * dt, ny = e.y + (dy / d) * e.speed * dt;
         if (!this.world.isSolid(nx, e.y) && !this.world.inVillage(nx, e.y)) e.x = nx;

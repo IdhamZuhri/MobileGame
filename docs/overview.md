@@ -26,7 +26,7 @@
 - Auto-attack combat with biome-specific enemies
 - XP, levels, 8 upgrades chosen at level-up
 - 3 gear slots, 5 rarities, random affixes, compare-and-equip inventory
-- Walled safe village with four gates, Merchant, Healer and Quest Board (no shooting from inside)
+- Walled safe village with four gates, Merchant, Healer and Quest Board with a peaceful no-enemy, no-shooting zone around it
 - 4 bosses guarding lairs across the world
 - Rolling quests, gold economy
 - Difficulty that grows with distance from the village

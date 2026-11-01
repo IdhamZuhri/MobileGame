@@ -32,6 +32,7 @@ player.recalc();
 const enemies = new Enemies(world);
 const combat = new Combat(player, enemies);
 combat.isSafe = () => world.inVillage(player.x, player.y);
+combat.noAttack = () => world.inHaven(player.x, player.y);
 const quests = new Quests(() => player.stats.level);
 const bosses = new Bosses(world, enemies);
 
@@ -235,7 +236,7 @@ function frame(now) {
   fpsAcc += dt; fpsN++;
   if (fpsAcc >= 0.5) {
     hudFps.textContent = Math.round(fpsN / fpsAcc) + ' fps';
-    hudPos.textContent = world.inVillage(player.x, player.y) ? '🏠 safe' : `⚠ x${world.danger(player.x, player.y).toFixed(1)}`;
+    hudPos.textContent = world.inVillage(player.x, player.y) ? '🏠 safe' : world.inHaven(player.x, player.y) ? '🛡 peaceful' : `⚠ x${world.danger(player.x, player.y).toFixed(1)}`;
     hudBiome.textContent = world.tileAtPx(player.x, player.y).name;
     fpsAcc = 0; fpsN = 0;
   }
