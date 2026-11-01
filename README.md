@@ -13,11 +13,13 @@ Controls: drag anywhere (virtual joystick) or WASD / arrow keys.
 - `js/rng.js` – seeded noise
 - `js/world.js` – procedural chunked world + data-driven biome table
 - `js/input.js` – joystick + keyboard
+- `js/enemies.js` – data-driven enemy table, biome-based spawning, chase AI
+- `js/combat.js` – player stats, auto-attack projectiles, XP gems, damage text
 - `js/main.js` – game loop, player, camera
 
 ## Roadmap
 1. ✅ Core movement + procedural world
-2. Combat: auto-attack, enemies, XP
+2. ✅ Combat: auto-attack, enemies, XP
 3. Progression: levels, stats, saving
 4. Gear + inventory
 5. Bosses, quests, village hub
