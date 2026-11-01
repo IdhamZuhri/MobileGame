@@ -32,8 +32,9 @@ All numbers below match the code at the time of writing. If you change a number 
 - **Contact damage:** an enemy touching you deals `max(1, enemy.dmg - armor)`, then you get 0.6 s of invulnerability.
 - **Regeneration:** `regen` HP per second, capped at effective max HP.
 - **Death:** the death screen appears. Tapping respawns you in the village at full HP. Nothing is lost.
-- **Safe zone:** inside the plaza, contact damage and enemy bullets are ignored, and enemies cannot enter. **You also cannot auto-attack while inside**, so the village is a refuge and not a place to farm from. Fight outside the gates.
-- **Enemy spawning:** one spawn attempt every `max(0.35, 1.2 - 0.05 * level)` seconds, up to 40 enemies. They appear 40-120 px beyond the screen edge, on non-solid, non-village tiles, with a type matching the biome. Enemies farther than 700 px are removed.
+- **Peaceful zone:** within 7 tiles beyond the plaza edge (13 tiles from the village centre) no enemy spawns, and any enemy that walks in vanishes. You cannot auto-attack there either, so you can't shoot monsters from the edge. The top bar shows 🛡 peaceful.
+- **Safe zone:** inside the plaza, contact damage and enemy bullets are ignored, and enemies cannot enter. **You cannot auto-attack here or in the peaceful zone**, so the village is a refuge and not a place to farm from. Fight beyond the peaceful zone.
+- **Enemy spawning:** one spawn attempt every `max(0.35, 1.2 - 0.05 * level)` seconds, up to 40 enemies. They appear 40-120 px beyond the screen edge, on non-solid, non-village tiles, with a type matching the biome. Enemies farther than 700 px are removed. They also never spawn in the peaceful zone.
 - **Enemy AI:** walk straight at the player, blocked by solid tiles and the village. Soft separation stops them stacking.
 - **XP gems:** dropped on death, pulled toward you inside `magnet` range (base 70 px), collected on touch.
 

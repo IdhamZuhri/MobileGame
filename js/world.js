@@ -1,6 +1,7 @@
 import { fbm, hash2 } from './rng.js';
 
 export const TILE = 32;
+export const HAVEN_MARGIN = 7; // tiles of peaceful ground beyond the plaza
 
 // Data-driven biome table: add a biome here and it appears in the world.
 export const TILES = {
@@ -31,6 +32,11 @@ export class World {
   inVillage(x, y) {
     const v = this.village;
     return !!v && Math.hypot(x / TILE - v.cx - 0.5, y / TILE - v.cy - 0.5) <= v.r;
+  }
+  // Peaceful buffer around the village: no enemies spawn or survive here, and you cannot shoot from it.
+  inHaven(x, y) {
+    const v = this.village;
+    return !!v && Math.hypot(x / TILE - v.cx - 0.5, y / TILE - v.cy - 0.5) <= v.r + HAVEN_MARGIN;
   }
   // Enemies get tougher the farther you roam from the village.
   danger(x, y) {

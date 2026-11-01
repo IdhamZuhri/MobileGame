@@ -9,6 +9,7 @@ export class Combat {
   constructor(player, enemies) {
     this.player = player; this.enemies = enemies;
     this.projectiles = []; this.gems = []; this.texts = [];
+    this.noAttack = () => false; // set by main: true in the peaceful zone around the village
     this.isSafe = () => false; // set by main: true inside the village
     this.pendingLevelUps = 0; this.cd = 0; this.iframes = 0; this.dead = false; this.kills = 0;
   }
@@ -21,7 +22,7 @@ export class Combat {
 
     // Auto-attack the nearest enemy in range.
     this.cd -= dt;
-    if (this.cd <= 0 && !this.isSafe()) {   // no shooting from inside the village: it is a refuge, not a turret
+    if (this.cd <= 0 && !this.noAttack()) {   // no shooting from the peaceful zone: it is a refuge, not a turret
       const t = this.enemies.nearest(p.x, p.y, s.range);
       if (t) {
         const base = Math.atan2(t.y - p.y, t.x - p.x), spread = 0.2;
