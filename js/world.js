@@ -12,6 +12,7 @@ export const TILES = {
   desert:    { name: 'Desert',     color: '#d9b25f', deco: 'cactus' },
   snow:      { name: 'Tundra',     color: '#e8f1f5', deco: 'pine' },
   mountain:  { name: 'Mountains',  color: '#7b7f86', solid: true },
+  plaza:     { name: 'Home Village', color: '#c9b98f' },
 };
 
 export class World {
@@ -19,10 +20,43 @@ export class World {
     this.seed = seed;
     this.cache = new Map(); // chunk key -> Uint8 array of tile ids
     this.ids = Object.keys(TILES);
+    this.village = null; // { cx, cy, r } in tiles; the safe hub
+  }
+
+  setVillage(cx, cy, r) { this.village = { cx, cy, r }; this.cache.clear(); }
+
+  villagePx() { return { x: (this.village.cx + 0.5) * TILE, y: (this.village.cy + 0.5) * TILE }; }
+  inVillage(x, y) {
+    const v = this.village;
+    return !!v && Math.hypot(x / TILE - v.cx - 0.5, y / TILE - v.cy - 0.5) <= v.r;
+  }
+  // Enemies get tougher the farther you roam from the village.
+  danger(x, y) {
+    if (!this.village) return 1;
+    const c = this.villagePx();
+    return 1 + Math.min(3, Math.hypot(x - c.x, y - c.y) / 3500);
+  }
+
+  // Find a flat, walkable site (prefer grass) for the village hub.
+  findVillageSite() {
+    const flat = (tx, ty) => {
+      for (let dy = -7; dy <= 7; dy += 2) for (let dx = -7; dx <= 7; dx += 2)
+        if (TILES[this.generate(tx + dx, ty + dy)].solid) return false;
+      return true;
+    };
+    for (const wantGrass of [true, false])
+      for (let r = 0; r < 150; r += 2)
+        for (let a = 0; a < 24; a++) {
+          const tx = Math.round(Math.cos(a / 24 * 6.2832) * r), ty = Math.round(Math.sin(a / 24 * 6.2832) * r);
+          if (wantGrass && this.generate(tx, ty) !== 'grass') continue;
+          if (flat(tx, ty)) return { x: tx, y: ty };
+        }
+    return { x: 0, y: 0 };
   }
 
   // Procedurally decide a tile from elevation / moisture / temperature noise.
   generate(tx, ty) {
+    if (this.village && Math.hypot(tx - this.village.cx, ty - this.village.cy) <= this.village.r) return 'plaza';
     const s = this.seed;
     const e = fbm(tx / 40, ty / 40, s, 4);
     const m = fbm(tx / 55, ty / 55, s + 7, 3);

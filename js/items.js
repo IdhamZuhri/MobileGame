@@ -46,7 +46,7 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 export function generateItem(ilvl, opts = {}) {
   const slotId = opts.slot || pick(Object.keys(SLOTS));
   const slot = SLOTS[slotId];
-  const rIdx = opts.rarity ?? weightedRarity(ilvl);
+  const rIdx = opts.rarity ?? Math.max(opts.minRarity || 0, weightedRarity(ilvl));
   const rar = RARITIES[rIdx];
   const stats = { [slot.primary]: rollValue(slot.primary, ilvl, rar.mult) };
   const pool = AFFIX_POOL.filter(k => k !== slot.primary);
@@ -83,3 +83,5 @@ export function computeEffective(base, equipped) {
 
 // Chance an enemy drops gear, scaled by how tough it is.
 export function dropChance(enemy) { return Math.min(0.35, 0.05 + enemy.xp * 0.006); }
+
+export function sellPrice(item) { return Math.round((2 + item.ilvl * 2) * (1 + item.rarity * 1.6)); }
