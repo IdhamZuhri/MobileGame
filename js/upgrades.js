@@ -3,7 +3,7 @@
 export const UPGRADES = {
   power:    { icon: '⚔️', name: 'Power',      desc: '+20% damage',          apply: s => { s.dmg = Math.round(s.dmg * 1.2 + 1); } },
   rapid:    { icon: '⚡', name: 'Rapid Fire', desc: '+15% attack speed',    apply: s => { s.attackCd = Math.max(0.2, s.attackCd * 0.85); }, max: 8 },
-  vitality: { icon: '❤️', name: 'Vitality',   desc: '+30 max HP, heal 30',  apply: s => { s.maxHp += 30; s.hp = Math.min(s.maxHp, s.hp + 30); } },
+  vitality: { icon: '❤️', name: 'Vitality',   desc: '+30 max HP, heal 30',  apply: s => { s.maxHp += 30; s.hp += 30; /* clamped to effective max by recalc */ } },
   swift:    { icon: '👟', name: 'Swift',      desc: '+8% move speed',       apply: s => { s.speed *= 1.08; }, max: 8 },
   reach:    { icon: '🎯', name: 'Reach',      desc: '+15% attack range',    apply: s => { s.range *= 1.15; }, max: 6 },
   multi:    { icon: '🔱', name: 'Multishot',  desc: '+1 projectile',        apply: s => { s.multi += 1; }, max: 4 },

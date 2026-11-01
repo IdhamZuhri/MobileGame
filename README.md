@@ -17,12 +17,15 @@ Controls: drag anywhere (virtual joystick) or WASD / arrow keys.
 - `js/combat.js` – player stats, auto-attack projectiles, XP gems, damage text
 - `js/upgrades.js` – data-driven upgrade pool, pick-1-of-3 rolling
 - `js/save.js` – localStorage save/load
+- `js/items.js` – gear slots, rarities, random generation, effective-stat math
+- `js/loot.js` – ground drops and pickup
+- `js/inventory.js` – inventory screen (equip, compare, discard)
 - `js/main.js` – game loop, player, camera
 
 ## Roadmap
 1. ✅ Core movement + procedural world
 2. ✅ Combat: auto-attack, enemies, XP
 3. ✅ Progression: level-up upgrade choices, saving
-4. Gear + inventory
+4. ✅ Gear + inventory
 5. Bosses, quests, village hub
 6. PWA + GitHub Pages deploy

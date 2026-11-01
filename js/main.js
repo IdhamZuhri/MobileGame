@@ -3,6 +3,9 @@ import { Input } from './input.js';
 import { Enemies } from './enemies.js';
 import { Combat, makePlayerStats, xpForLevel } from './combat.js';
 import { UPGRADES, rollChoices, applyUpgrade } from './upgrades.js';
+import { generateItem, computeEffective, dropChance, RARITIES } from './items.js';
+import { Loot } from './loot.js';
+import { InventoryUI, BAG_SIZE } from './inventory.js';
 import { loadSave, writeSave, clearSave } from './save.js';
 
 const canvas = document.getElementById('game');
@@ -14,13 +17,16 @@ const hudFps = document.getElementById('hud-fps');
 const world = new World(1337);
 const input = new Input(canvas);
 const spawn = world.findSpawn();
-const player = { x: spawn.x, y: spawn.y, r: 9, stats: makePlayerStats(), picks: {} };
+const player = { x: spawn.x, y: spawn.y, r: 9, stats: makePlayerStats(), picks: {}, equipped: { weapon: null, armor: null, trinket: null }, bag: [], eff: null,
+  // Recompute effective stats whenever gear or upgrades change.
+  recalc() { this.eff = computeEffective(this.stats, this.equipped); this.stats.hp = Math.min(this.stats.hp, this.eff.maxHp); } };
+player.recalc();
 const enemies = new Enemies(world);
 const combat = new Combat(player, enemies);
 
 // ---- Save / load ----
 function snapshot() {
-  return { v: 1, x: player.x, y: player.y, stats: player.stats, picks: player.picks, kills: combat.kills, pending: combat.pendingLevelUps };
+  return { v: 1, x: player.x, y: player.y, stats: player.stats, picks: player.picks, kills: combat.kills, pending: combat.pendingLevelUps, equipped: player.equipped, bag: player.bag };
 }
 let resetting = false;
 function save() { if (!combat.dead && !resetting) writeSave(snapshot()); }
@@ -31,6 +37,9 @@ if (saved) {
   if (!world.isSolid(saved.x, saved.y)) { player.x = saved.x; player.y = saved.y; }
   combat.kills = saved.kills || 0;
   combat.pendingLevelUps = saved.pending || 0;
+  player.equipped = { weapon: null, armor: null, trinket: null, ...(saved.equipped || {}) };
+  player.bag = saved.bag || [];
+  player.recalc();
 }
 setInterval(save, 5000);
 addEventListener('pagehide', save);
@@ -50,7 +59,7 @@ function showChoices() {
     b.className = 'card';
     b.innerHTML = `<span class="ic">${u.icon}</span><span><b>${u.name}</b>${n ? ` <i>Lv ${n + 1}</i>` : ''}<br>${u.desc}</span>`;
     b.onclick = () => {
-      applyUpgrade(player.stats, player.picks, id);
+      applyUpgrade(player.stats, player.picks, id); player.recalc();
       combat.pendingLevelUps--;
       choosing = false; overlay.style.display = 'none'; save();
     };
@@ -58,6 +67,22 @@ function showChoices() {
   }
   overlay.style.display = 'flex';
 }
+// ---- Loot & inventory ----
+const loot = new Loot();
+const inventory = new InventoryUI(player, { onChange: () => { player.recalc(); save(); } });
+const bagBtn = document.getElementById('bag-btn');
+function pickup(item) {
+  if (player.bag.length >= BAG_SIZE) {
+    if (!pickup.warned || performance.now() - pickup.warned > 2000) { combat.text(player.x, player.y - 20, 'Bag full!', '#ff6b6b'); pickup.warned = performance.now(); }
+    return false;
+  }
+  if (!player.equipped[item.slot]) { player.equipped[item.slot] = item; player.recalc(); }   // auto-equip into empty slots
+  else player.bag.push(item);
+  combat.text(player.x, player.y - 20, item.name, RARITIES[item.rarity].color);
+  save();
+  return true;
+}
+combat.onKill = e => { if (Math.random() < dropChance(e)) loot.add(e.x, e.y, generateItem(player.stats.level)); };
 document.getElementById('reset').onclick = () => {
   if (confirm('Delete your progress and start over?')) { resetting = true; clearSave(); location.reload(); }
 };
@@ -82,21 +107,23 @@ function blocked(x, y) {
 
 function update(dt) {
   if (combat.dead) return;
-  if (choosing) return;
+  if (choosing || inventory.open) return;
   if (combat.pendingLevelUps > 0) { showChoices(); return; }
   const a = input.axis();
-  const nx = player.x + a.x * player.stats.speed * dt;
-  const ny = player.y + a.y * player.stats.speed * dt;
+  const nx = player.x + a.x * player.eff.speed * dt;
+  const ny = player.y + a.y * player.eff.speed * dt;
   if (!blocked(nx, player.y)) player.x = nx;
   if (!blocked(player.x, ny)) player.y = ny;
   enemies.update(dt, player, player.stats.level);
   combat.update(dt);
+  loot.update(dt, player, pickup);
+  bagBtn.textContent = `🎒 ${player.bag.length}`;
 }
 
 function restart() {
   const sp = world.findSpawn();
-  player.x = sp.x; player.y = sp.y; player.stats.hp = player.stats.maxHp;
-  enemies.list = []; combat.projectiles = []; combat.gems = []; combat.texts = [];
+  player.x = sp.x; player.y = sp.y; player.stats.hp = player.eff.maxHp;
+  enemies.list = []; combat.projectiles = []; combat.gems = []; combat.texts = []; loot.drops = [];
   combat.dead = false; combat.iframes = 1; save();
 }
 addEventListener('pointerdown', () => { if (combat.dead && performance.now() - combat.diedAt > 600) restart(); });
@@ -105,6 +132,7 @@ addEventListener('keydown', e => { if (combat.dead && e.key === ' ') restart(); 
 function draw() {
   const camX = player.x - W / 2, camY = player.y - H / 2;
   world.draw(ctx, camX, camY, W, H);
+  loot.draw(ctx, camX, camY);
   enemies.draw(ctx, camX, camY);
   combat.draw(ctx, camX, camY);
   // player
@@ -122,9 +150,9 @@ function drawHud() {
   const st = player.stats, pad = 12, bw = Math.min(W - pad * 2, 320);
   const y = Math.max(8, parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 8);
   ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(pad, y, bw, 16);
-  ctx.fillStyle = '#e44'; ctx.fillRect(pad, y, bw * st.hp / st.maxHp, 16);
+  ctx.fillStyle = '#e44'; ctx.fillRect(pad, y, bw * st.hp / player.eff.maxHp, 16);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 12px system-ui'; ctx.textAlign = 'left';
-  ctx.fillText(`HP ${Math.ceil(st.hp)}/${st.maxHp}`, pad + 6, y + 12);
+  ctx.fillText(`HP ${Math.ceil(st.hp)}/${Math.round(player.eff.maxHp)}`, pad + 6, y + 12);
   ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(pad, y + 20, bw, 10);
   ctx.fillStyle = '#4fd1ff'; ctx.fillRect(pad, y + 20, bw * st.xp / xpForLevel(st.level), 10);
   ctx.fillStyle = '#fff'; ctx.fillText(`Lv ${st.level}   Kills ${combat.kills}`, pad, y + 46);
@@ -158,4 +186,4 @@ function frame(now) {
 requestAnimationFrame(frame);
 
 // Test hook
-window.__game = { player, world, TILES, enemies, combat };
+window.__game = { player, world, TILES, enemies, combat, loot, inventory };

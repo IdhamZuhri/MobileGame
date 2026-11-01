@@ -12,3 +12,29 @@ html, body { margin: 0; height: 100%; background: #111418; overflow: hidden; tou
 .card:active { background: #34404e; border-color: #ffd24a; }
 .card .ic { font-size: 30px; }
 .card i { color: #ffd24a; font-style: normal; font-size: 12px; }
+#bag-btn { position: fixed; right: 10px; bottom: max(14px, env(safe-area-inset-bottom)); height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid rgba(255,255,255,.35); background: rgba(0,0,0,.55); color: #fff; font-size: 16px; z-index: 5; touch-action: manipulation; }
+#inventory { position: fixed; inset: 0; display: none; justify-content: center; align-items: flex-start; background: rgba(0,0,0,.78); z-index: 11; overflow-y: auto; }
+#inventory .panel { width: min(100%, 400px); box-sizing: border-box; padding: 14px; color: #fff; font: 14px system-ui, sans-serif; }
+#inventory .row { display: flex; justify-content: space-between; align-items: center; }
+#inventory h2 { margin: 0; font-size: 20px; color: #ffd24a; }
+#inv-close { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #4a5666; background: #232a33; color: #fff; font-size: 18px; }
+#inv-stats { margin: 8px 0; font-size: 12px; color: #aab4c0; }
+#inv-equipped { display: flex; gap: 10px; margin-bottom: 10px; }
+#inv-count { font-size: 12px; color: #aab4c0; margin-bottom: 6px; }
+#inv-bag { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.tile { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; border: 2px solid #3a4452; background: #1c222a; color: #fff; padding: 0; position: relative; touch-action: manipulation; }
+#inv-equipped .tile { width: 64px; }
+.tile.sel { box-shadow: 0 0 0 2px #fff; }
+.tile .ic { font-size: 24px; }
+.tile small { font-size: 10px; color: #aab4c0; }
+.tile small.empty { font-size: 22px; opacity: .35; }
+#inv-detail { margin-top: 14px; padding: 12px; background: #1c222a; border-radius: 12px; min-height: 60px; }
+#inv-detail h3 { margin: 0 0 2px; font-size: 17px; }
+#inv-detail .sub { color: #aab4c0; font-size: 12px; margin-bottom: 8px; }
+#inv-detail ul { margin: 0 0 10px; padding-left: 18px; }
+#inv-detail .hint { margin: 0; color: #7d8895; }
+#inv-detail em { font-style: normal; font-size: 12px; }
+em.up { color: #5fd16a; } em.down { color: #ff6b6b; } .lost { color: #ff6b6b; }
+.btns { display: flex; gap: 10px; }
+.btns button { flex: 1; padding: 12px; border-radius: 10px; border: 0; background: #3b82f6; color: #fff; font-size: 15px; touch-action: manipulation; }
+.btns button.danger { background: #7a2e2e; }

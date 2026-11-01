@@ -13,9 +13,9 @@ export class Combat {
   }
 
   update(dt) {
-    const p = this.player, s = p.stats;
+    const p = this.player, st = p.stats, s = p.eff; // st = hp/xp/level, s = effective combat stats (base + gear)
     if (this.dead) return;
-    s.hp = Math.min(s.maxHp, s.hp + s.regen * dt);
+    st.hp = Math.min(s.maxHp, st.hp + s.regen * dt);
     this.iframes = Math.max(0, this.iframes - dt);
 
     // Auto-attack the nearest enemy in range.
@@ -46,9 +46,10 @@ export class Combat {
     // Enemy contact damage.
     for (const e of this.enemies.list) {
       if (this.iframes <= 0 && Math.hypot(e.x - p.x, e.y - p.y) < e.r + p.r) {
-        s.hp -= e.dmg; this.iframes = 0.6;
-        this.text(p.x, p.y - 14, '-' + e.dmg, '#ff6b6b');
-        if (s.hp <= 0) { s.hp = 0; this.dead = true; }
+        const hit = Math.max(1, e.dmg - s.armor);
+        st.hp -= hit; this.iframes = 0.6;
+        this.text(p.x, p.y - 14, '-' + hit, '#ff6b6b');
+        if (st.hp <= 0) { st.hp = 0; this.dead = true; }
       }
     }
 
@@ -70,6 +71,7 @@ export class Combat {
     if (e.hp <= 0 && !e.dead) {
       e.dead = true; this.kills++;
       this.gems.push({ x: e.x, y: e.y, xp: e.xp });
+      if (this.onKill) this.onKill(e);
     }
   }
 
@@ -79,7 +81,8 @@ export class Combat {
     while (s.xp >= xpForLevel(s.level)) {
       s.xp -= xpForLevel(s.level);
       s.level++;
-      s.maxHp += 10; s.hp = s.maxHp;
+      s.maxHp += 10;
+      this.player.recalc(); s.hp = this.player.eff.maxHp;
       this.pendingLevelUps++;
       this.text(this.player.x, this.player.y - 26, 'LEVEL ' + s.level + '!', '#ffd24a');
     }
