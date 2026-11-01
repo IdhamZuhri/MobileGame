@@ -9,6 +9,7 @@ export class Combat {
   constructor(player, enemies) {
     this.player = player; this.enemies = enemies;
     this.projectiles = []; this.gems = []; this.texts = [];
+    this.isSafe = () => false; // set by main: true inside the village
     this.pendingLevelUps = 0; this.cd = 0; this.iframes = 0; this.dead = false; this.kills = 0;
   }
 
@@ -44,13 +45,11 @@ export class Combat {
     this.projectiles = this.projectiles.filter(pr => pr.life > 0);
 
     // Enemy contact damage.
-    for (const e of this.enemies.list) {
-      if (this.iframes <= 0 && Math.hypot(e.x - p.x, e.y - p.y) < e.r + p.r) {
-        const hit = Math.max(1, e.dmg - s.armor);
-        st.hp -= hit; this.iframes = 0.6;
-        this.text(p.x, p.y - 14, '-' + hit, '#ff6b6b');
-        if (st.hp <= 0) { st.hp = 0; this.dead = true; }
-      }
+    if (!this.isSafe()) {
+      for (const e of this.enemies.list)
+        if (this.iframes <= 0 && Math.hypot(e.x - p.x, e.y - p.y) < e.r + p.r) this.hurt(e.dmg);
+      for (const sh of this.enemies.shots)
+        if (this.iframes <= 0 && Math.hypot(sh.x - p.x, sh.y - p.y) < p.r + 5) { sh.life = 0; this.hurt(sh.dmg); }
     }
 
     // Gems get pulled toward the player and collected.
@@ -63,6 +62,13 @@ export class Combat {
 
     for (const t of this.texts) { t.y -= 28 * dt; t.life -= dt; }
     this.texts = this.texts.filter(t => t.life > 0);
+  }
+
+  hurt(raw) {
+    const st = this.player.stats, hit = Math.max(1, raw - this.player.eff.armor);
+    st.hp -= hit; this.iframes = 0.6;
+    this.text(this.player.x, this.player.y - 14, '-' + hit, '#ff6b6b');
+    if (st.hp <= 0) { st.hp = 0; this.dead = true; }
   }
 
   damage(e, amount) {

@@ -38,3 +38,16 @@ em.up { color: #5fd16a; } em.down { color: #ff6b6b; } .lost { color: #ff6b6b; }
 .btns { display: flex; gap: 10px; }
 .btns button { flex: 1; padding: 12px; border-radius: 10px; border: 0; background: #3b82f6; color: #fff; font-size: 15px; touch-action: manipulation; }
 .btns button.danger { background: #7a2e2e; }
+#interact { position: fixed; left: 50%; bottom: max(70px, calc(env(safe-area-inset-bottom) + 56px)); transform: translateX(-50%); display: none; padding: 12px 22px; border-radius: 26px; border: 2px solid #ffd24a; background: rgba(20,24,30,.9); color: #fff; font-size: 17px; z-index: 6; touch-action: manipulation; }
+#dialog { position: fixed; inset: 0; display: none; justify-content: center; align-items: flex-start; background: rgba(0,0,0,.78); z-index: 12; overflow-y: auto; }
+#dialog .panel { width: min(100%, 400px); box-sizing: border-box; padding: 14px; color: #fff; font: 14px system-ui, sans-serif; }
+#dialog .row { display: flex; justify-content: space-between; align-items: center; }
+#dialog h2 { margin: 0; font-size: 20px; color: #ffd24a; }
+#dlg-close { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #4a5666; background: #232a33; color: #fff; font-size: 18px; }
+#dlg-body h4 { margin: 16px 0 6px; color: #aab4c0; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+#dlg-body .gold { margin-top: 8px; color: #ffd24a; font-weight: bold; }
+#dlg-body .line { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; margin-bottom: 8px; background: #1c222a; border-radius: 10px; }
+#dlg-body .line small { color: #aab4c0; }
+#dlg-body .line button { min-width: 64px; padding: 10px 12px; border: 0; border-radius: 8px; background: #3b82f6; color: #fff; font-size: 14px; touch-action: manipulation; }
+#dlg-body .line button.go { background: #2f9e55; }
+#dlg-body .line button:disabled { background: #333b46; color: #7d8895; }

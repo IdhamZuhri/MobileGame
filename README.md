@@ -20,6 +20,10 @@ Controls: drag anywhere (virtual joystick) or WASD / arrow keys.
 - `js/items.js` – gear slots, rarities, random generation, effective-stat math
 - `js/loot.js` – ground drops and pickup
 - `js/inventory.js` – inventory screen (equip, compare, discard)
+- `js/village.js` – safe hub with Merchant, Healer, Quest Board
+- `js/town.js` – village dialogs (shop, heal, quests)
+- `js/quests.js` – quest generation and progress tracking
+- `js/bosses.js` – deterministic boss lairs, spawn/despawn, respawn cooldown
 - `js/main.js` – game loop, player, camera
 
 ## Roadmap
@@ -27,5 +31,5 @@ Controls: drag anywhere (virtual joystick) or WASD / arrow keys.
 2. ✅ Combat: auto-attack, enemies, XP
 3. ✅ Progression: level-up upgrade choices, saving
 4. ✅ Gear + inventory
-5. Bosses, quests, village hub
+5. ✅ Bosses, quests, village hub
 6. PWA + GitHub Pages deploy
