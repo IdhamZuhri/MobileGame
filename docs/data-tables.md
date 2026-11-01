@@ -14,6 +14,8 @@ Where each table lives in code is shown in the heading.
 | snow | Tundra | | pine |
 | mountain | Mountains | yes | |
 | plaza | Home Village | | |
+| wall | Village Wall | yes | brick pattern |
+| gate | Village Gate | | plank pattern |
 
 ## Enemies (`enemies.js` ENEMY_TYPES)
 Base values before danger scaling.

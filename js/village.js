@@ -20,7 +20,28 @@ export class Village {
     return best;
   }
 
+  // Two stone towers and a wooden beam over each of the four gates.
+  drawGates(ctx, camX, camY) {
+    const v = this.world.village, c = this.world.villagePx(), reach = (v.r + 0.5) * TILE, half = 1.5 * TILE;
+    for (const [ux, uy] of [[0, -1], [0, 1], [1, 0], [-1, 0]]) {
+      const gx = c.x + ux * reach - camX, gy = c.y + uy * reach - camY;
+      const px = -uy, py = ux; // perpendicular to the gate direction
+      const towers = [[gx + px * half, gy + py * half], [gx - px * half, gy - py * half]];
+      ctx.strokeStyle = '#6b4f2a'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(towers[0][0], towers[0][1] - 26); ctx.lineTo(towers[1][0], towers[1][1] - 26); ctx.stroke();
+      for (const [tx, ty] of towers) {
+        ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillRect(tx - 11, ty + 12, 22, 7);
+        ctx.fillStyle = '#7d7468'; ctx.fillRect(tx - 10, ty - 30, 20, 44);
+        ctx.fillStyle = '#5c544a'; ctx.fillRect(tx - 10, ty - 30, 20, 7);
+        ctx.fillStyle = '#8f8678';
+        for (let i = 0; i < 3; i++) ctx.fillRect(tx - 10 + i * 8, ty - 36, 5, 7);      // battlements
+        ctx.fillStyle = '#c0392b'; ctx.fillRect(tx - 1, ty - 52, 2, 16); ctx.fillRect(tx + 1, ty - 52, 9, 6); // flag
+      }
+    }
+  }
+
   draw(ctx, camX, camY) {
+    this.drawGates(ctx, camX, camY);
     for (const s of this.stations) {
       const x = s.x - camX, y = s.y - camY;
       ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(x - 22, y + 14, 44, 6);

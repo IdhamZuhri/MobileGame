@@ -22,7 +22,7 @@ const hudFps = document.getElementById('hud-fps');
 const world = new World(1337);
 const input = new Input(canvas);
 const site = world.findVillageSite();
-world.setVillage(site.x, site.y, 7);
+world.setVillage(site.x, site.y, 6);
 const village = new Village(world);
 const spawn = world.villagePx();
 const player = { x: spawn.x, y: spawn.y, r: 9, stats: makePlayerStats(), picks: {}, equipped: { weapon: null, armor: null, trinket: null }, bag: [], eff: null, gold: 0,

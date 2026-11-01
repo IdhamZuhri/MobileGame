@@ -8,7 +8,8 @@ All numbers below match the code at the time of writing. If you change a number 
 
 | Condition | Tile |
 |---|---|
-| inside village radius | plaza |
+| within 6 tiles of the village centre | plaza |
+| 6-7 tiles from the centre | wall (solid), or gate on the 4 compass openings (3 tiles wide) |
 | e < 0.30 | deep water (solid) |
 | e < 0.38 | water (solid) |
 | e < 0.42 | beach |
@@ -31,7 +32,7 @@ All numbers below match the code at the time of writing. If you change a number 
 - **Contact damage:** an enemy touching you deals `max(1, enemy.dmg - armor)`, then you get 0.6 s of invulnerability.
 - **Regeneration:** `regen` HP per second, capped at effective max HP.
 - **Death:** the death screen appears. Tapping respawns you in the village at full HP. Nothing is lost.
-- **Safe zone:** inside the village, contact damage and enemy bullets are ignored, and enemies cannot enter.
+- **Safe zone:** inside the plaza, contact damage and enemy bullets are ignored, and enemies cannot enter. **You also cannot auto-attack while inside**, so the village is a refuge and not a place to farm from. Fight outside the gates.
 - **Enemy spawning:** one spawn attempt every `max(0.35, 1.2 - 0.05 * level)` seconds, up to 40 enemies. They appear 40-120 px beyond the screen edge, on non-solid, non-village tiles, with a type matching the biome. Enemies farther than 700 px are removed.
 - **Enemy AI:** walk straight at the player, blocked by solid tiles and the village. Soft separation stops them stacking.
 - **XP gems:** dropped on death, pulled toward you inside `magnet` range (base 70 px), collected on touch.
@@ -54,7 +55,8 @@ All numbers below match the code at the time of writing. If you change a number 
 - **Inventory UI:** tap an item to see its stats. Green and red arrows compare it to the item you wear in that slot. Actions: Equip (swaps with the worn item), Unequip, Discard.
 
 ## Village (`village.js`, `town.js`)
-- A flat plaza of radius 7 tiles, placed at the first flat grass area found by spiralling out from the origin.
+- A flat plaza of radius 6 tiles, placed at the first flat grass area found by spiralling out from the origin.
+- A stone wall ring surrounds the plaza. It has four 3-tile-wide gates (north, south, east, west), each with two towers and a wooden beam. The wall blocks the player, so you must leave through a gate.
 - Stations (tap the bottom-centre button within 54 px):
   - **Merchant:** buy crates, sell bag items, sell all commons.
   - **Healer:** free full heal.
